@@ -19,7 +19,7 @@ const RoomSchema: Schema<RoomValues> = new Schema(
     },
     name: { type: String, required: true },
     type: { type: String },
-    price: { type: Number },
+    price: { type: Number, required: true },
     status: {
       type: String,
       enum: ["available", "blocked"],
@@ -28,7 +28,7 @@ const RoomSchema: Schema<RoomValues> = new Schema(
     images: [{ type: String }],
     createdAt: { type: Date, default: Date.now },
   },
-  { versionKey: false }
+  { versionKey: false, timestamps: true }
 );
 
 export default mongoose.model<RoomValues>("Room", RoomSchema);
