@@ -15,7 +15,7 @@ export const checkIntent = (
  Add Room - {intent: add_room, data: {name: the_room_name, property_name: the_property_name, price: room_price}}. 
  View rooms - {intent: view_rooms, data: {property_name: the_property_name}} . 
  Nothing matches : {intent: unrecognized}
-
+Wants to sync OTAs(online travel agencies) like Beds24 - {intent: beds24_sync, data: {roomId: the_room_id, fromDate: the_from_date, toDate: the_to_date, availability: the_availability, price: the_price}}.
 
 
 
