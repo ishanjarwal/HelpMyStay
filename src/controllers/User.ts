@@ -3,52 +3,82 @@ import User from "../models/User";
 import twilioClient from "../config/twilio";
 import model from "../config/gemini";
 import { checkIntent } from "../utils/generatePrompts";
+import {
+  addProperty,
+  addRoom,
+  registerNewUser,
+  viewProperties,
+  viewRooms,
+} from "../actions/hostActions";
 
-export const createUser: RequestHandler = async (req, res) => {
+const availableKeywords = [
+  "add_room",
+  "add_property",
+  "view_bookings",
+  "block_room",
+  "change_rate",
+  "unblock_room",
+  "weekly_analytics",
+  "daily_analytics",
+  "view_properties",
+  "view_rooms",
+  "register_user",
+] as const;
+
+export const handleRequest: RequestHandler = async (req, res) => {
   console.log(req.body);
 
   const from = req.body.From as string; // "whatsapp:+911234567890"
   const body = (req.body.Body as string).trim().toLowerCase();
 
+  let message = "";
   try {
-    const check = await User.findOne({ phone: from });
+    const prompt = checkIntent(body, from);
+    let result = await model.generateContent(prompt);
+    const modelResponse = JSON.parse(result.response.text()) as {
+      intent: (typeof availableKeywords)[number];
+      data: any;
+    };
 
-    if (!check) {
-      // create the user
-      const user = new User({
-        name: req.body.ProfileName,
-        phone: from,
-      });
-      await user.save();
+    console.log(modelResponse);
 
-      await twilioClient.messages.create({
-        from: "whatsapp:+14155238886",
-        to: from,
-        body: "Welcome, You have been registered",
-      });
-
-      res.sendStatus(200);
-    } else {
-      const prompt = checkIntent(req.body.Body);
-
-      let result = await model.generateContent(prompt);
-      const modelResponse = result.response.text();
-
-      console.log(modelResponse);
-
-      await twilioClient.messages.create({
-        from: "whatsapp:+14155238886",
-        to: from,
-        body: modelResponse,
-      });
-      res.end();
+    switch (modelResponse?.intent) {
+      case "add_room":
+        message = await addRoom(modelResponse.data);
+        break;
+      case "view_rooms":
+        message = await viewRooms(modelResponse.data?.property_name as string);
+        break;
+      case "view_properties":
+        message = await viewProperties();
+        break;
+      case "add_property":
+        message = await addProperty(modelResponse.data);
+        break;
+      default:
+        message = await registerNewUser(modelResponse.data);
+        break;
     }
-  } catch (error) {
-    console.error("User‑create/check error:", error);
+
     await twilioClient.messages.create({
       from: "whatsapp:+14155238886",
       to: from,
-      body: "Something is off",
+      body: message,
+    });
+
+    res.end();
+  } catch (error) {
+    console.error(error);
+    await twilioClient.messages.create({
+      from: "whatsapp:+14155238886",
+      to: from,
+      body: `
+❓Sorry, I didn’t catch that. You can try:
+“Add my property”
+“Update room price”
+“Show my current bookings”
+"Show weekly analytics"
+`,
     });
 
     res.end();

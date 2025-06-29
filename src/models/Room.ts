@@ -26,9 +26,8 @@ const RoomSchema: Schema<RoomValues> = new Schema(
       default: "available",
     },
     images: [{ type: String }],
-    createdAt: { type: Date, default: Date.now },
   },
-  { versionKey: false, timestamps: true }
+  { timestamps: true }
 );
 
 export default mongoose.model<RoomValues>("Room", RoomSchema);
