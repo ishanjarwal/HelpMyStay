@@ -31,6 +31,18 @@ export const handleRequest: RequestHandler = async (req, res) => {
   const from = req.body.From as string; // "whatsapp:+911234567890"
   const body = (req.body.Body as string).trim().toLowerCase();
 
+  const greeings = ["hi", "hello", "hey"];
+
+  if (greeings.some((el) => body.includes(el))) {
+    await twilioClient.messages.create({
+      from: "whatsapp:+14155238886",
+      to: from,
+      body: "Hey there, How may I assist your, Should I register you as a user ?",
+    });
+    res.end();
+    return;
+  }
+
   let message = "";
   try {
     const prompt = checkIntent(body, from);
@@ -55,8 +67,11 @@ export const handleRequest: RequestHandler = async (req, res) => {
       case "add_property":
         message = await addProperty(modelResponse.data);
         break;
-      default:
+      case "register_user":
         message = await registerNewUser(modelResponse.data);
+        break;
+      default:
+        throw new Error("Unrecognized intent");
         break;
     }
 

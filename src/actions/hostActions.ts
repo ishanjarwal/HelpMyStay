@@ -77,17 +77,14 @@ export const registerNewUser = async (data: any) => {
   try {
     const user = await User.findOne({ phone: data.phone });
     if (!user) {
-      return `
-👋 Welcome to Help My Stay!
+      await new User({
+        phone: data.phone,
+        role: data.role,
+      }).save();
+    }
 
-I’m your assistant for managing your property bookings.
-How would you like register 
-1. As a Hotel Owner
-2. As a Customer
-`;
-    } else {
-      if (user.role === "host") {
-        return `
+    if (data.role === "host") {
+      return `
 👋 Welcome to Help My Stay!
 
 I’m your assistant for managing your property bookings.
@@ -103,9 +100,13 @@ You can just reply with your request, like:
 ➡️ "Block Room 2 from July 5 to July 7"
 ➡️ "Change price of Room 1 to ₹1500 for Saturday"
             `;
-      } else {
-        return `Hey there, Give commands`;
-      }
+    } else {
+      return `
+Hey there, I am Help My Stay, Your go to assistant for hotel bookings
+Try 
+  View my hotel bookings
+  Give directions to my hotel
+`;
     }
   } catch (error) {
     throw error;

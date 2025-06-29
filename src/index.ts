@@ -4,6 +4,7 @@ import express from "express";
 import { handleRequest } from "./controllers/User";
 import connectDB from "./utils/connectdb";
 import axios from "axios";
+import twilioClient from "./config/twilio";
 dotenv.config();
 
 const app = express();
@@ -14,9 +15,28 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 connectDB(process.env.DB_URL as string);
+
+app.get("/", async (req, res) => {
+  try {
+    console.log("test");
+    await twilioClient.messages.create({
+      from: "whatsapp:+14155238886",
+      to: "whatsapp:+919116080979",
+      body: "",
+    });
+
+    res.status(200).json({ message: "hello" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
+});
+
 app.post("/", handleRequest);
 
 app.get("/webhook", (req, res) => {
+  console.log("Webhook test request initiated");
+
   const mode = req.query["hub.mode"];
   const token = req.query["hub.verify_token"];
   const challenge = req.query["hub.challenge"];
@@ -45,7 +65,7 @@ app.post("/webhook", async (req, res) => {
 
         // Send a reply
         await axios.post(
-          "https://graph.facebook.com/v19.0/755243627663429/messages",
+          "https://graph.facebook.com/v23.0/755243627663429/messages",
           {
             messaging_product: "whatsapp",
             to: from,
