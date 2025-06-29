@@ -10,6 +10,7 @@ import {
   viewProperties,
   viewRooms,
 } from "../actions/hostActions";
+import { syncToBeds24, syncToCoolOTA } from "../otacontroller";
 
 const availableKeywords = [
   "add_room",
@@ -23,6 +24,7 @@ const availableKeywords = [
   "view_properties",
   "view_rooms",
   "register_user",
+  "CoolOTA_sync"
 ] as const;
 
 export const handleRequest: RequestHandler = async (req, res) => {
@@ -70,6 +72,8 @@ export const handleRequest: RequestHandler = async (req, res) => {
       case "register_user":
         message = await registerNewUser(modelResponse.data);
         break;
+      case "CoolOTA_sync":
+        message = await syncToCoolOTA(modelResponse.data); // call mock OTA sync
       default:
         throw new Error("Unrecognized intent");
         break;

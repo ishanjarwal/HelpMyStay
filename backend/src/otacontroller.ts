@@ -2,7 +2,7 @@
 import { Request, Response } from "express";
 
 // Simulate a fake sync to Beds24
-export const syncToBeds24 = async (req: Request, res: Response):Promise<string> => {
+export const syncToCoolOTA = async (req: Request, res: Response):Promise<string> => {
   try {
     const { roomId, fromDate, toDate, availability, price } = req.body;
 
@@ -15,9 +15,9 @@ export const syncToBeds24 = async (req: Request, res: Response):Promise<string> 
       Price: ${price}`);
     
 
-   return `✅ Synced room ${roomId} to Beds24 successfully.`
+   return `✅ Synced room ${roomId} to CoolOTA successfully.`
   } catch (err) {
-    console.error("Beds24 Sync Error:", err);
+    console.error("CoolOTA Sync Error:", err);
     return "❌ Sync failed";
   }
 };
