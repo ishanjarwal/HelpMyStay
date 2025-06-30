@@ -1,13 +1,13 @@
-// controllers/otaController.ts
+
 import { Request, Response } from "express";
 
-// Simulate a fake sync to Beds24
-export const syncToCoolOTA = async (req: Request, res: Response):Promise<string> => {
+// Simulating a sync to OTA API!!!!
+export const syncToCoolOTA = async (data:any):Promise<string> => {
   try {
-    const { roomId, fromDate, toDate, availability, price } = req.body;
+    const { roomId, fromDate, toDate, availability, price } = data;
 
-    // Mock response as if from Beds24 API
-    console.log(`Syncing to Beds24:
+    // Response
+    console.log(`Syncing to CoolOTA:
       Room ID: ${roomId}
       From: ${fromDate}
       To: ${toDate}
